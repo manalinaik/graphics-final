@@ -28,7 +28,7 @@ namespace
   {
     // seed the random number generator with the current time
     srand( time( NULL ) );
-    system = new FlockSystem(5); // by default use FlockSystem
+    system = new FlockSystem(20); // by default use FlockSystem
     timeStepper = new RK4();
     stepSize = .04;	
   }

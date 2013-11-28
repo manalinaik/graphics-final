@@ -25,7 +25,9 @@ public:
 
 	Vector3f separation(int particleIndex, vector<Vector3f> state);
 
-	Vector3f align(int particleIndex, vector<Vector3f> state);
+	Vector3f alignment(int particleIndex, vector<Vector3f> state);
+
+	Vector3f cohesion(int particleIndex, vector<Vector3f> state);
 
 	Vector3f center(Vector3f pos, Vector3f vel);
 

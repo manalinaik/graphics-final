@@ -3,7 +3,7 @@
 
 FlockSystem::FlockSystem(int numParticles):ParticleSystem(numParticles)
 {
-	maxSep = .2;
+	maxSep = .3;
 	maxSpeed = 1;
 	maxForce = 1;
 	for (int i=0; i < numParticles; i++) {
@@ -62,9 +62,10 @@ vector<Vector3f> FlockSystem::evalF(vector<Vector3f> state)
 	    f.push_back(vel);
 	    
 	    Vector3f a;
-	    a += separation(i, state) * .3;
-	    a += center(pos, vel) * .2;
-	    a += align(i, state) * .3;
+	    a += separation(i, state) * .2;
+	    a += center(pos, vel) * .1;
+	    a += alignment(i, state) * .3;
+	    a += cohesion(i, state) * .3;
 
 	    f.push_back(a / flock[i].getMass());
 	}
@@ -94,7 +95,7 @@ Vector3f FlockSystem::separation(int particleIndex, vector<Vector3f> state)
     return sep;
 }
 
-Vector3f FlockSystem::align(int particleIndex, vector<Vector3f> state)
+Vector3f FlockSystem::alignment(int particleIndex, vector<Vector3f> state)
 {
     int count = 0;
     Vector3f align;
@@ -104,7 +105,7 @@ Vector3f FlockSystem::align(int particleIndex, vector<Vector3f> state)
 	if (particleIndex == j) 
 	    continue;
 	Vector3f dist = pos - state[getParticlePosIndex(j)];
-	if (dist.abs() > 0 && dist.abs() < 2*maxSep) {
+	if (dist.abs() > 0 && dist.abs() < 5*maxSep) {
 	    align += state[getParticleVelIndex(j)];
 	    count++;
 	}
@@ -113,6 +114,29 @@ Vector3f FlockSystem::align(int particleIndex, vector<Vector3f> state)
 	align = align / count;
     limit(align, vel);
     return align;
+}
+
+Vector3f FlockSystem::cohesion(int particleIndex, vector<Vector3f> state)
+{
+    int count = 0;
+    Vector3f cohesion;
+    Vector3f pos = state[getParticlePosIndex(particleIndex)];
+    Vector3f vel = state[getParticleVelIndex(particleIndex)];
+    for (int j = 0; j < m_numParticles; j++) {
+	if (particleIndex == j) 
+	    continue;
+	Vector3f dist = pos - state[getParticlePosIndex(j)];
+	if (dist.abs() > 0 && dist.abs() < 5*maxSep) {
+	    cohesion += state[getParticlePosIndex(j)];
+	    count++;
+	}
+    }
+    if (count > 0) {
+	cohesion = cohesion / count;
+	cohesion -= pos;
+    }
+    limit(cohesion, vel);
+    return cohesion;
 }
 
 Vector3f FlockSystem::center(Vector3f pos, Vector3f vel)
