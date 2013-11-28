@@ -2,7 +2,9 @@
 
 FlockSystem::FlockSystem(int numParticles):ParticleSystem(numParticles)
 {
-	maxSep = 0.2;
+	maxSep = .2;
+	maxSpeed = 1;
+	maxForce = 1;
 	for (int i=0; i < numParticles; i++) {
 		// Random location
 		float x = 0.01 * (rand() % 400) - 2;
@@ -11,9 +13,9 @@ FlockSystem::FlockSystem(int numParticles):ParticleSystem(numParticles)
 
 		// Random velocity
 		int xSign = (rand() % 2) * 2 - 1;
-		x = xSign * 0.01 * (rand() % 100) + 0.1;
+		x = xSign * 0.01 * (rand() % 50) + 0.1;
 		int ySign = (rand() % 2) * 2 - 1;
-		y = ySign * 0.01 * (rand() % 100) + 0.1;
+		y = ySign * 0.01 * (rand() % 50) + 0.1;
 		Vector3f vel = Vector3f(x, y, 0);
 
 		Foid foid = Foid(0.1, pos, vel);
@@ -57,31 +59,78 @@ vector<Vector3f> FlockSystem::evalF(vector<Vector3f> state)
 	    Vector3f pos = state[getParticlePosIndex(i)];
 	    Vector3f vel = state[getParticleVelIndex(i)];
 	    f.push_back(vel);
-	    int count = 0;
-	    Vector3f sep;
-	    Vector3f center;
+	    
 	    Vector3f a;
-	    for (int j=0; j < m_numParticles; j++) {
-		if (i == j) 
-		    continue;
-		Vector3f dist = pos - state[getParticlePosIndex(j)];
-		if (dist.abs() > 0 && dist.abs() < maxSep) {
-		    dist.normalize();
-		    sep += (dist / dist.abs());
-		    count++;
-		}
-	    }
-	    if (count > 0)
-		sep = sep / count;
-	    if (sep.abs() > 0)
-	        sep -= vel;
-	    a += sep;
-	    center = -pos * pos.absSquared() * 0.5;
-	    a += center;
+	    a += separation(i, state);
+	    a += center(pos, vel);
+	    a += align(i, state);
+
 	    f.push_back(a / flock[i].getMass());
 	}
 
 	return f;
+}
+
+Vector3f FlockSystem::separation(int particleIndex, vector<Vector3f> state)
+{
+    int count = 0;
+    Vector3f sep;
+    Vector3f pos = state[getParticlePosIndex(particleIndex)];
+    Vector3f vel = state[getParticleVelIndex(particleIndex)];
+    for (int j = 0; j < m_numParticles; j++) {
+	if (particleIndex == j) 
+	    continue;
+	Vector3f dist = pos - state[getParticlePosIndex(j)];
+	if (dist.abs() > 0 && dist.abs() < maxSep) {
+	    dist.normalize();
+	    sep += (dist / dist.abs());
+	    count++;
+	}
+    }
+    if (count > 0)
+	sep = sep / count;
+    limit(sep, vel);
+    return sep;
+}
+
+Vector3f FlockSystem::align(int particleIndex, vector<Vector3f> state)
+{
+    int count = 0;
+    Vector3f align;
+    Vector3f pos = state[getParticlePosIndex(particleIndex)];
+    Vector3f vel = state[getParticleVelIndex(particleIndex)];
+    for (int j = 0; j < m_numParticles; j++) {
+	if (particleIndex == j) 
+	    continue;
+	Vector3f dist = pos - state[getParticlePosIndex(j)];
+	if (dist.abs() > 0 && dist.abs() < 2*maxSep) {
+	    align += state[getParticleVelIndex(j)];
+	    count++;
+	}
+    }
+    if (count > 0)
+	align = align / count;
+    limit(align, vel);
+    return align;
+}
+
+Vector3f FlockSystem::center(Vector3f pos, Vector3f vel)
+{
+    Vector3f center;
+    if (pos.abs() > 6)
+	center = -pos * pos.abs() * 0.01;
+    limit(center, vel);
+    return center;
+}
+
+void FlockSystem::limit(Vector3f desired, Vector3f vel)
+{
+    if (desired.abs() > 0) {
+        desired.normalize();
+	desired = desired * maxSpeed - vel;
+	if (desired.abs() > maxForce)
+	    desired *= (maxForce / desired.abs());
+    }
 }
 
 // render the system (ie draw the particles)
