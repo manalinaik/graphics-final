@@ -76,7 +76,7 @@ vector<Vector3f> FlockSystem::evalF(vector<Vector3f> state)
 	    if (sep.abs() > 0)
 	        sep -= vel;
 	    a += sep;
-	    center = -pos * pos.absSquared() * 0.01;
+	    center = -pos * pos.absSquared() * 0.5;
 	    a += center;
 	    f.push_back(a / flock[i].getMass());
 	}

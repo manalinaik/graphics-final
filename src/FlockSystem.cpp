@@ -57,28 +57,7 @@ vector<Vector3f> FlockSystem::evalF(vector<Vector3f> state)
 	    Vector3f pos = state[getParticlePosIndex(i)];
 	    Vector3f vel = state[getParticleVelIndex(i)];
 	    f.push_back(vel);
-	    int count = 0;
-	    Vector3f sep;
-	    Vector3f center;
-	    Vector3f a;
-	    for (int j=0; j < m_numParticles; j++) {
-		if (i == j) 
-		    continue;
-		Vector3f dist = pos - state[getParticlePosIndex(j)];
-		if (dist.abs() > 0 && dist.abs() < maxSep) {
-		    dist.normalize();
-		    sep += (dist / dist.abs());
-		    count++;
-		}
-	    }
-	    if (count > 0)
-		sep = sep / count;
-	    if (sep.abs() > 0)
-	        sep -= vel;
-	    a += sep;
-	    center = -pos * pos.absSquared() * 0.5;
-	    a += center;
-	    f.push_back(a / flock[i].getMass());
+	    f.push_back(Vector3f());
 	}
 
 	return f;
