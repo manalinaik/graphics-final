@@ -1,0 +1,80 @@
+Assignment 3: README
+Manali Naik
+
+COMPILE CODE:
+cd into /three and run make
+
+
+RUN CODE:
+
+To run the executable, type
+./a3 <e|t|r> <step size> [highlight spring index]
+The first two arguments are required.
+
+Selecting "e" will run Euler, "t" is Trapezoidal,
+and "r" is for RK.
+
+The step size should be a float.
+
+The optional argument [highlight spring index] will
+run the pendulum chain system, highlighting the springs
+connected to the particle of the given index. Particle 0
+is fixed at the origin.
+
+The simulations work best with the "r" option, although
+"t" will also work fairly well (the system will explode after
+waiting long enough). The best step size is 0.04 (which is 
+what I used during testing).
+
+
+UI FEATURES:
+
+The default system is the simple system.
+
+Switching between systems:
+Press "1" to switch to the simple system.
+Press "2" to switch to the pendulum system.
+    - Note: The pendulum system is hardcoded to use 4 particles.
+	    The first particle is fixed at the origin, the other
+	    three are free to move.
+Press "3" to switch to the cloth system.
+    - Note: The cloth system is hardcoded to use an 8x8 grid of 
+	    particles. The top left and top right particles are
+	    fixed.
+
+Press "r" to reset the current system.
+Press "s" to toggle the display of all springs (if you're in 
+	the pendulum or cloth system).
+
+Moving the Cloth System:
+Press "f" to move the cloth forward.
+Press "b" to move the cloth backward.
+You can hold either key down to keep it moving more continuously.
+
+Sidenote: The cloth is displayed by rendering all the 
+          springs (structural, shear, and flex).
+
+
+COLLABORATION:
+I discussed a few parts of the project with Shannon Kao, but
+we coded independently.
+
+
+REFERENCES:
+Course notes, C++ tutorials, Stack Overflow
+
+
+ISSUES:
+Since Trapezoidal and Euler are not as precise, they will explode
+if you wait long enough (but that is to be expected).
+
+
+EXTRA CREDIT:
+None
+
+
+COMMENTS:
+It would have been useful to provide us earlier on with some
+guidance on how to choose good values of k, the drag constant,
+etc.
+

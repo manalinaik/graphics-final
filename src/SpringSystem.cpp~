@@ -1,0 +1,6 @@
+#include "SpringSystem.h"
+
+SpringSystem::SpringSystem(int numParticles):PhysicalSystem(numParticles)
+{
+	g = Vector3f(0, -9.81, 0);
+}

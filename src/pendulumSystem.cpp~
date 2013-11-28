@@ -1,0 +1,100 @@
+#include "pendulumSystem.h"
+
+PendulumSystem::PendulumSystem(int numParticles, int showSpringParticle):SpringSystem(numParticles)
+{
+	drawAllSprings = false;
+	m_numParticles = numParticles;
+	highlightParticle = showSpringParticle;
+	float particleDist = 0.5;
+	m = 0.1;
+	dragConst = 0.1;//0.015;
+	
+	// initialize the state based on the number of particles
+	for (int i = 0; i < m_numParticles; i++) {		
+		// for this system, we care about the position and the velocity
+		m_vVecState.push_back(Vector3f(i * particleDist, 0, 0));
+		m_vVecState.push_back(Vector3f(0, 0, 0));
+	}
+
+	// just make chain of springs for now
+	for (int i = 0; i < m_numParticles-1; i++){
+		Spring spring;
+		spring.p1 = i;
+		spring.p2 = i+1;
+		spring.k = 8;
+		spring.restLength = 0.5;
+		springs.push_back(spring);
+		if ( i > 0 )
+			spring.k = 0.5; // make subsequent springs less stiff
+	}
+}
+
+// for a given state, evaluate f(X,t)
+vector<Vector3f> PendulumSystem::evalF(vector<Vector3f> state)
+{
+	vector<Vector3f> f;
+
+	// push velocities (and intermediate values of a) onto f
+	// calculate acceleration caused by gravity and drag forces
+	for ( int i = 0; i < m_numParticles; i++ )
+	{
+		f.push_back(state[getParticleVelIndex(i)]);
+		Vector3f a = g;
+		Vector3f drag = state[getParticleVelIndex(i)];
+		drag = (-1 * dragConst) * drag;
+		drag = drag / m;
+		a += drag;
+		f.push_back(a);
+	}
+
+	// calculate acceleration caused by spring forces
+	
+	for( Spring s : springs )
+	{
+		Vector3f d = state[getParticlePosIndex(s.p1)] - 
+			     state[getParticlePosIndex(s.p2)];
+		Vector3f F = (d / d.abs());
+		F *= (-s.k * (d.abs() - s.restLength));
+		Vector3f a = F / m;
+		f[getParticleVelIndex(s.p1)] += a;
+		f[getParticleVelIndex(s.p2)] += (-1 * a);
+	}
+
+	// make first particle fixed
+	f[0] = Vector3f();
+	f[1] = Vector3f();
+
+	return f;
+}
+
+// render the system (ie draw the particles)
+void PendulumSystem::draw()
+{
+	for (int i = 0; i < m_numParticles; i++) {
+		Vector3f pos = getParticlePos(i);//  position of particle i
+		glPushMatrix();
+		glTranslatef(pos[0], pos[1], pos[2] );
+		glutSolidSphere(0.075f,10.0f,10.0f);
+		glPopMatrix();
+	}
+	drawSprings();
+}
+
+void PendulumSystem::drawSprings()
+{
+    glDisable(GL_LIGHTING);
+    for( Spring s : springs) {
+        if( drawAllSprings || (s.p1 == highlightParticle || 
+	    s.p2 == highlightParticle)) {
+	    glLineWidth(3);
+	    glColor3f(0.0, 1.0, 0.0);
+	    glBegin(GL_LINES);
+	    Vector3f v1 = getParticlePos(s.p1);
+	    Vector3f v2 = getParticlePos(s.p2);
+	    glVertex3f(v1[0], v1[1], v1[2]);
+	    glVertex3f(v2[0], v2[1], v2[2]);
+	    glEnd();
+	}
+    }
+    glEnable(GL_LIGHTING);
+}

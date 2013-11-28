@@ -1,0 +1,36 @@
+
+#include "simpleSystem.h"
+
+using namespace std;
+
+SimpleSystem::SimpleSystem()
+{
+	m_vVecState.push_back(Vector3f(.5, 0, 0));
+}
+
+// for a given state, evaluate f(X,t)
+vector<Vector3f> SimpleSystem::evalF(vector<Vector3f> state)
+{
+	vector<Vector3f> f;
+
+	for( Vector3f p : state)
+	{
+		Vector3f v;
+		v[0] = -1 * p[1];
+		v[1] = p[0];
+		v[2] = 0;
+		f.push_back(v);
+	}
+
+	return f;
+}
+
+// render the system (ie draw the particles)
+void SimpleSystem::draw()
+{
+		Vector3f pos = m_vVecState[0]; //YOUR PARTICLE POSITION
+	        glPushMatrix();
+		glTranslatef(pos[0], pos[1], pos[2] );
+		glutSolidSphere(0.075f,10.0f,10.0f);
+		glPopMatrix();
+}
