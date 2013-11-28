@@ -1,4 +1,5 @@
 #include "FlockSystem.h"
+#include <iostream>
 
 FlockSystem::FlockSystem(int numParticles):ParticleSystem(numParticles)
 {
@@ -61,9 +62,9 @@ vector<Vector3f> FlockSystem::evalF(vector<Vector3f> state)
 	    f.push_back(vel);
 	    
 	    Vector3f a;
-	    a += separation(i, state);
-	    a += center(pos, vel);
-	    a += align(i, state);
+	    a += separation(i, state) * .3;
+	    a += center(pos, vel) * .2;
+	    a += align(i, state) * .3;
 
 	    f.push_back(a / flock[i].getMass());
 	}
@@ -123,7 +124,7 @@ Vector3f FlockSystem::center(Vector3f pos, Vector3f vel)
     return center;
 }
 
-void FlockSystem::limit(Vector3f desired, Vector3f vel)
+void FlockSystem::limit(Vector3f& desired, Vector3f vel)
 {
     if (desired.abs() > 0) {
         desired.normalize();

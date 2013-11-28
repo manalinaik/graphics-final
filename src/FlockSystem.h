@@ -29,7 +29,7 @@ public:
 
 	Vector3f center(Vector3f pos, Vector3f vel);
 
-	void limit(Vector3f desired, Vector3f vel);
+	void limit(Vector3f& desired, Vector3f vel);
 	
 	void draw();
 
