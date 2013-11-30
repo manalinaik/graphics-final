@@ -28,7 +28,7 @@ namespace
   {
     // seed the random number generator with the current time
     srand( time( NULL ) );
-    system = new FlockSystem(20); // by default use FlockSystem
+    system = new FlockSystem(30); // by default use FlockSystem
     timeStepper = new RK4();
     stepSize = .04;	
   }
@@ -52,9 +52,7 @@ namespace
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, particleColor);
     
     //glutSolidSphere(0.1f,10.0f,10.0f);
-    
-    system->draw();
-    
+       
     
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, floorColor);
     glPushMatrix();
@@ -62,6 +60,8 @@ namespace
     glScaled(50.0f,50.0f,0.01f);
     glutSolidCube(1);
     glPopMatrix();
+
+    system->draw();
     
   }
         

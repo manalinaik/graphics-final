@@ -3,9 +3,9 @@
 
 FlockSystem::FlockSystem(int numParticles):ParticleSystem(numParticles)
 {
-	maxSep = .3;
-	maxSpeed = 1;
-	maxForce = 1;
+	maxSep = 3.75;
+	maxSpeed = .5;
+	maxForce = .03;
 	for (int i=0; i < numParticles; i++) {
 		// Random location
 		float x = 0.01 * (rand() % 400) - 2;
@@ -62,10 +62,10 @@ vector<Vector3f> FlockSystem::evalF(vector<Vector3f> state)
 	    f.push_back(vel);
 	    
 	    Vector3f a;
-	    a += separation(i, state) * .4;
-	    a += center(pos, vel) * .1;
-	    a += alignment(i, state) * .25;
-	    a += cohesion(i, state) * .25;
+	    a += separation(i, state) * 1.5;
+	    a += center(pos, vel);
+	    a += alignment(i, state);
+	    a += cohesion(i, state);
 
 	    f.push_back(a / flock[i].getMass());
 	}
@@ -105,7 +105,7 @@ Vector3f FlockSystem::alignment(int particleIndex, vector<Vector3f> state)
 	if (particleIndex == j) 
 	    continue;
 	Vector3f dist = pos - state[getParticlePosIndex(j)];
-	if (dist.abs() > 0 && dist.abs() < 5*maxSep) {
+	if (dist.abs() > 0 && dist.abs() < 2*maxSep) {
 	    align += state[getParticleVelIndex(j)];
 	    count++;
 	}
@@ -126,7 +126,7 @@ Vector3f FlockSystem::cohesion(int particleIndex, vector<Vector3f> state)
 	if (particleIndex == j) 
 	    continue;
 	Vector3f dist = pos - state[getParticlePosIndex(j)];
-	if (dist.abs() > 0 && dist.abs() < 5*maxSep) {
+	if (dist.abs() > 0 && dist.abs() < 2*maxSep) {
 	    cohesion += state[getParticlePosIndex(j)];
 	    count++;
 	}
@@ -165,7 +165,21 @@ void FlockSystem::draw()
 		Vector3f pos = getParticlePos(i);//  position of particle i
 		glPushMatrix();
 		glTranslatef(pos[0], pos[1], pos[2] );
-		glutSolidSphere(0.075f,10.0f,10.0f);
+		//glutSolidSphere(0.075f,10.0f,10.0f);
+		glDisable(GL_LIGHTING);
+		Vector3f normal = Vector3f(0, 0, 1);
+		Vector3f vel = getParticleVel(i).normalized() * -0.3;
+		Vector3f cross = Vector3f::cross(normal, vel).normalized() * 0.1;
+		glBegin(GL_TRIANGLES);
+		glColor3f(0.7f, 0.4f, 0.0f);
+		glNormal(normal);
+		glVertex(Vector3f());
+		glNormal(normal);
+		glVertex(vel - cross);
+		glNormal(normal);
+		glVertex(vel + cross);	    
+		glEnd();
+		glEnable(GL_LIGHTING);
 		glPopMatrix();
 	}
 }
