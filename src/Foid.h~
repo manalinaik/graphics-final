@@ -1,6 +1,7 @@
 #ifndef FOID_H
 #define FOID_H
 
+#include "extra.h"
 #include <vector>
 
 using namespace std;

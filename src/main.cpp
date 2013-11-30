@@ -12,13 +12,15 @@
 #include "TimeStepper.h"
 #include "FlockSystem.h"
 
+#define PI 3.14159265
+
 using namespace std;
 
 // Globals here.
 namespace
 {
 
-    ParticleSystem *system;
+    FlockSystem *system;
     TimeStepper * timeStepper;
     float stepSize;
 
@@ -28,7 +30,7 @@ namespace
   {
     // seed the random number generator with the current time
     srand( time( NULL ) );
-    system = new FlockSystem(30); // by default use FlockSystem
+    system = new FlockSystem(50); // by default use FlockSystem
     timeStepper = new RK4();
     stepSize = .04;	
   }
@@ -119,6 +121,27 @@ namespace
         //glutPostRedisplay();
     }
 
+    Vector3f getWorldCoords(int i, int j)
+    {
+	float width = glutGet(GLUT_WINDOW_WIDTH);
+	float height = glutGet(GLUT_WINDOW_HEIGHT);
+	float x = i / (width/2.0) - 1;
+	float y = j / (height/2.0) - 1;
+	Vector3f r0 = Vector3f(0, 0, 10);
+	float d = 1 / tan(30 * 180 / PI);
+	Vector3f rd = (x * Vector3f(1, 0, 0) + 
+		       y * Vector3f(0, -1, 0) + 
+		       d * Vector3f(0, 0, -1)).normalized();
+	float denom = Vector3f::dot(Vector3f(0,0,1), rd);
+	if ( denom != 0 ) {
+	    float num = Vector3f::dot(Vector3f(0,0,1), r0);
+	    float t = -num / denom;
+	    Vector3f pt = r0 + rd * t;
+	    return pt;
+	}
+	throw 1;
+    }
+
     //  Called when mouse button is pressed.
     void mouseFunc(int button, int state, int x, int y)
     {
@@ -129,7 +152,14 @@ namespace
             switch (button)
             {
             case GLUT_LEFT_BUTTON:
-                camera.MouseClick(Camera::LEFT, x, y);
+                //camera.MouseClick(Camera::LEFT, x, y);
+		try {
+		    Vector3f pt = getWorldCoords(x, y);
+		    system->addFood(pt);
+		}
+		catch (int e) {
+		    cout << "Could not add food." << endl;
+		}		
                 break;
             case GLUT_MIDDLE_BUTTON:
                 camera.MouseClick(Camera::MIDDLE, x, y);

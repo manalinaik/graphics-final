@@ -4,6 +4,7 @@
 #include "extra.h"
 #include <vector>
 #include <cstdlib>
+#include <cfloat>
 
 #include "particleSystem.h"
 #include "Foid.h"
@@ -31,15 +32,21 @@ public:
 
 	Vector3f center(Vector3f pos, Vector3f vel);
 
+	Vector3f hunger(Vector3f pos, Vector3f vel);
+
 	void limit(Vector3f& desired, Vector3f vel);
 	
 	void draw();
 
+	void addFood(Vector3f loc);
+
 protected:
 	vector<Foid> flock;
+	vector<Vector3f> food;
 	float maxSep;
 	float maxSpeed;
 	float maxForce;
+	float eatDist;
 	
 };
 
