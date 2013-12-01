@@ -24,6 +24,8 @@ public:
 	
 	vector<Vector3f> evalF(vector<Vector3f> state);
 
+	void limitZ(Vector3f pos, Vector3f& vel, Vector3f& a);
+
 	Vector3f separation(int particleIndex, vector<Vector3f> state);
 
 	Vector3f alignment(int particleIndex, vector<Vector3f> state);
@@ -38,6 +40,8 @@ public:
 	
 	void draw();
 
+	Vector3f depthColor(float z, Vector3f color);
+
 	void addFood(Vector3f loc);
 
 protected:
@@ -47,6 +51,7 @@ protected:
 	float maxSpeed;
 	float maxForce;
 	float eatDist;
+	Vector3f waterColor;
 	
 };
 

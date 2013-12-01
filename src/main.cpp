@@ -152,7 +152,7 @@ namespace
             switch (button)
             {
             case GLUT_LEFT_BUTTON:
-                //camera.MouseClick(Camera::LEFT, x, y);
+                camera.MouseClick(Camera::LEFT, x, y);
 		try {
 		    Vector3f pt = getWorldCoords(x, y);
 		    system->addFood(pt);

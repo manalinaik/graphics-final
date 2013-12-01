@@ -1,24 +1,30 @@
 #include "FlockSystem.h"
 #include <iostream>
 
+#define PI 3.14159265
+
 FlockSystem::FlockSystem(int numParticles):ParticleSystem(numParticles)
 {
-	maxSep = 3;
+	maxSep = 2.5;
 	maxSpeed = .5;
 	maxForce = .03;
 	eatDist = .1;
+	waterColor = Vector3f(0.0f, 0.4f, 0.6f);
 	for (int i=0; i < numParticles; i++) {
 		// Random location
 		float x = 0.01 * (rand() % 400) - 2;
 		float y = 0.01 * (rand() % 400) - 2;
-		Vector3f pos = Vector3f(x, y, 0);
+		float z = -0.01 * (rand() % 60) - 0.2;
+		Vector3f pos = Vector3f(x, y, z);
 
 		// Random velocity
 		int xSign = (rand() % 2) * 2 - 1;
 		x = xSign * 0.01 * (rand() % 50) + 0.1;
 		int ySign = (rand() % 2) * 2 - 1;
 		y = ySign * 0.01 * (rand() % 50) + 0.1;
-		Vector3f vel = Vector3f(x, y, 0);
+		int zSign = (rand() % 2) * 2 - 1;
+		z = zSign * 0.01 * (rand() % 25);
+		Vector3f vel = Vector3f(x, y, z);
 
 		Foid foid = Foid(0.1, pos, vel);
 		float r = 0.01 * (rand() % 20) + 0.6;
@@ -64,7 +70,6 @@ vector<Vector3f> FlockSystem::evalF(vector<Vector3f> state)
 	{
 	    Vector3f pos = state[getParticlePosIndex(i)];
 	    Vector3f vel = state[getParticleVelIndex(i)];
-	    f.push_back(vel);
 	    
 	    Vector3f a;
 	    a += separation(i, state) * 1.5;
@@ -73,11 +78,28 @@ vector<Vector3f> FlockSystem::evalF(vector<Vector3f> state)
 	    a += cohesion(i, state);
 	    if (food.size() > 0)
 	        a += hunger(pos, vel) * 1.5;
-
+	    limitZ(pos, vel, a);
+	    f.push_back(vel);
 	    f.push_back(a / flock[i].getMass());
 	}
 
 	return f;
+}
+
+void FlockSystem::limitZ(Vector3f pos, Vector3f& vel, Vector3f& a)
+{
+    if (pos[2] > 0) {
+	vel[2] /= 2;
+	a[2] = -0.05;
+    }
+    if (pos[2] < -0.8) {
+	vel[2] /= 2;
+	a[2] = 0.05;
+    }
+    if (vel[2] > 0.25)
+	vel[2] = 0.25;
+    if (vel[2] < -0.25)
+	vel[2] = -0.25;
 }
 
 Vector3f FlockSystem::separation(int particleIndex, vector<Vector3f> state)
@@ -94,6 +116,11 @@ Vector3f FlockSystem::separation(int particleIndex, vector<Vector3f> state)
 	    dist.normalize();
 	    sep += (dist / dist.abs());
 	    count++;
+	    if (abs(dist[2]) < 0.1) {
+		int sign = (rand() % 2) * 2 - 1;
+		float z = sign * 0.01 * (rand() % 5);
+		sep += Vector3f(0, 0, z);
+	    }
 	}
     }
     if (count > 0)
@@ -149,7 +176,7 @@ Vector3f FlockSystem::cohesion(int particleIndex, vector<Vector3f> state)
 Vector3f FlockSystem::center(Vector3f pos, Vector3f vel)
 {
     Vector3f center;
-    if (pos.abs() > 6)
+    if (pos.abs() > 4)
 	center = -pos * pos.abs() * 0.01;
     limit(center, vel);
     return center;
@@ -187,22 +214,17 @@ void FlockSystem::limit(Vector3f& desired, Vector3f vel)
 void FlockSystem::draw()
 {
 	for (int i = 0; i < m_numParticles; i++) {
-		Vector3f pos = getParticlePos(i);//  position of particle i
+		Vector3f pos = getParticlePos(i);
+		Vector3f vel = getParticleVel(i);
 		glPushMatrix();
 		glTranslatef(pos[0], pos[1], pos[2] );
 		glDisable(GL_LIGHTING);
-		Vector3f normal = Vector3f(0, 0, 1);
-		Vector3f vel = getParticleVel(i).normalized() * -0.3;
-		Vector3f cross = Vector3f::cross(normal, vel).normalized() * 0.1;
-		glBegin(GL_TRIANGLES);		
-		glColor3f(flock[i].color[0], flock[i].color[1], flock[i].color[2]);
-		glNormal(normal);
-		glVertex(Vector3f());
-		glNormal(normal);
-		glVertex(vel - cross);
-		glNormal(normal);
-		glVertex(vel + cross);	    
-		glEnd();
+		float xyAngle = atan2(vel[1], vel[0]) * 180 / PI;
+		glRotatef(xyAngle, 0, 0, 1);
+		glScaled(0.2f,0.075f,0.075f);
+		Vector3f color = depthColor(pos[2], flock[i].color);
+		glColor3f(color[0], color[1], color[2]);
+	        glutSolidSphere(1.0f,10.0f,10.0f);
 		glEnable(GL_LIGHTING);
 		glPopMatrix();
 	}
@@ -215,6 +237,13 @@ void FlockSystem::draw()
 	    glPopMatrix();
 	    glEnable(GL_LIGHTING);
 	}
+}
+
+Vector3f FlockSystem::depthColor(float z, Vector3f color)
+{
+    Vector3f diff = color - waterColor;
+    diff = diff * z;
+    return color + diff;
 }
 
 void FlockSystem::addFood(Vector3f loc)
