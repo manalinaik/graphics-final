@@ -8,6 +8,7 @@
 
 #include "particleSystem.h"
 #include "Foid.h"
+#include "Food.h"
 
 class FlockSystem: public ParticleSystem
 {
@@ -46,7 +47,7 @@ public:
 
 protected:
 	vector<Foid> flock;
-	vector<Vector3f> food;
+	vector<Food*> food;
 	float maxSep;
 	float maxSpeed;
 	float maxForce;

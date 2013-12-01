@@ -79,6 +79,7 @@ OBJECTS := \
 	$(OBJDIR)/SpringSystem.o \
 	$(OBJDIR)/FlockSystem.o \
 	$(OBJDIR)/Foid.o \
+	$(OBJDIR)/Food.o \
 
 RESOURCES := \
 
@@ -170,6 +171,9 @@ $(OBJDIR)/FlockSystem.o: src/FlockSystem.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/Foid.o: src/Foid.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/Food.o: src/Food.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 

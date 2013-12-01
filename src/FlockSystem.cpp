@@ -8,7 +8,7 @@ FlockSystem::FlockSystem(int numParticles):ParticleSystem(numParticles)
 	maxSep = 2.5;
 	maxSpeed = .5;
 	maxForce = .03;
-	eatDist = .1;
+	eatDist = .3;
 	waterColor = Vector3f(0.0f, 0.4f, 0.6f);
 	for (int i=0; i < numParticles; i++) {
 		// Random location
@@ -187,15 +187,17 @@ Vector3f FlockSystem::hunger(Vector3f pos, Vector3f vel)
     float minDist = FLT_MAX;
     int targetIndex; 
     for (int i=0; i < food.size(); i++) {
-	float dist = (pos - food[i]).abs();
+	float dist = (pos - food[i]->getPos()).abs();
 	if (dist < minDist) {
 	    targetIndex = i;
 	    minDist = dist;
 	}
     }
-    if (minDist < eatDist)
+    Vector3f hunger = vel - (pos - food[targetIndex]->getPos());
+    if (minDist < eatDist) {
+	delete food[targetIndex];
 	food.erase(food.begin() + targetIndex);
-    Vector3f hunger = vel - (pos - food[targetIndex]);
+    }
     limit(hunger, vel);
     return hunger;
 }
@@ -228,14 +230,15 @@ void FlockSystem::draw()
 		glEnable(GL_LIGHTING);
 		glPopMatrix();
 	}
-	for (Vector3f f : food) {
-	    glDisable(GL_LIGHTING);
+	for (Food* f : food) {
+	    f->draw();
+	    /*glDisable(GL_LIGHTING);
 	    glPushMatrix();
 	    glTranslatef(f[0], f[1], f[2] );
 	    glColor3f(0.8f, 0.8f, 0.6f);
 	    glutSolidSphere(0.075f,10.0f,10.0f);
 	    glPopMatrix();
-	    glEnable(GL_LIGHTING);
+	    glEnable(GL_LIGHTING);*/
 	}
 }
 
@@ -248,5 +251,6 @@ Vector3f FlockSystem::depthColor(float z, Vector3f color)
 
 void FlockSystem::addFood(Vector3f loc)
 {
-    food.push_back(loc);
+    Food* f = new Food(loc);
+    food.push_back(f);
 }

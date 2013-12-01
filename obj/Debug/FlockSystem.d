@@ -3,7 +3,7 @@ obj/Debug/FlockSystem.o: src/FlockSystem.cpp src/FlockSystem.h \
  vecmath/include/Matrix3f.h vecmath/include/Matrix4f.h \
  vecmath/include/Quat4f.h vecmath/include/Vector2f.h \
  vecmath/include/Vector3f.h vecmath/include/Vector4f.h \
- src/particleSystem.h src/Foid.h
+ src/particleSystem.h src/Foid.h src/Food.h
 
 src/FlockSystem.h:
 
@@ -28,3 +28,5 @@ vecmath/include/Vector4f.h:
 src/particleSystem.h:
 
 src/Foid.h:
+
+src/Food.h:

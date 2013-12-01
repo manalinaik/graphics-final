@@ -8,6 +8,7 @@
 
 #include "particleSystem.h"
 #include "Foid.h"
+#include "Food.h"
 
 class FlockSystem: public ParticleSystem
 {
@@ -40,13 +41,13 @@ public:
 	
 	void draw();
 
-	Vector3f FlockSystem::depthColor(float z, Vector3f color);
+	Vector3f depthColor(float z, Vector3f color);
 
 	void addFood(Vector3f loc);
 
 protected:
 	vector<Foid> flock;
-	vector<Vector3f> food;
+	vector<Food> food;
 	float maxSep;
 	float maxSpeed;
 	float maxForce;
