@@ -21,6 +21,8 @@ public:
 
 	float getMass();
 
+	Vector3f color;
+
 protected:
 	Vector3f m_pos;
 

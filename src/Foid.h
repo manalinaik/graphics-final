@@ -22,6 +22,10 @@ public:
 	float getMass();
 
 	Vector3f color;
+	
+	float m_tail[3]; 
+	
+	int mult;
 
 protected:
 	Vector3f m_pos;
