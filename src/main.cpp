@@ -152,7 +152,6 @@ namespace
             switch (button)
             {
             case GLUT_LEFT_BUTTON:
-                camera.MouseClick(Camera::LEFT, x, y);
 		try {
 		    Vector3f pt = getWorldCoords(x, y);
 		    system->addFood(pt);
@@ -241,40 +240,7 @@ namespace
 
         // THIS IS WHERE THE DRAW CODE GOES.
 
-        drawSystem();
-
-        // This draws the coordinate axes when you're rotating, to
-        // keep yourself oriented.
-        if( g_mousePressed )
-        {
-            glPushMatrix();
-            Vector3f eye = camera.GetCenter();
-            glTranslatef( eye[0], eye[1], eye[2] );
-
-            // Save current state of OpenGL
-            glPushAttrib(GL_ALL_ATTRIB_BITS);
-
-            // This is to draw the axes when the mouse button is down
-            glDisable(GL_LIGHTING);
-            glLineWidth(3);
-            glPushMatrix();
-            glScaled(5.0,5.0,5.0);
-            glBegin(GL_LINES);
-            glColor4f(1,0.5,0.5,1); glVertex3f(0,0,0); glVertex3f(1,0,0);
-            glColor4f(0.5,1,0.5,1); glVertex3f(0,0,0); glVertex3f(0,1,0);
-            glColor4f(0.5,0.5,1,1); glVertex3f(0,0,0); glVertex3f(0,0,1);
-
-            glColor4f(0.5,0.5,0.5,1);
-            glVertex3f(0,0,0); glVertex3f(-1,0,0);
-            glVertex3f(0,0,0); glVertex3f(0,-1,0);
-            glVertex3f(0,0,0); glVertex3f(0,0,-1);
-
-            glEnd();
-            glPopMatrix();
-
-            glPopAttrib();
-            glPopMatrix();
-        }
+        drawSystem();    
                  
         // Dump the image to the screen.
         glutSwapBuffers();
