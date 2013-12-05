@@ -219,31 +219,41 @@ void FlockSystem::draw()
 		Vector3f pos = getParticlePos(i);
 		Vector3f vel = getParticleVel(i);
 		
-		Vector3f cross = Vector3f::cross(vel, Vector3f(0,0,1)).normalized() * 0.07;
-	        Vector3f test = -vel/2 + cross;
-	        Vector3f test2 = -vel/2 - cross;
+		Vector3f cross = Vector3f::cross(vel, Vector3f(0,0,1)).normalized() * 0.06;
+	        Vector3f test = vel/8 + cross;
+	        Vector3f test2 = vel/8 - cross;
 	        
 	        
 		glPushMatrix();
 		glTranslatef(pos[0], pos[1], pos[2] );
 		glDisable(GL_LIGHTING);
-		
-		glPushMatrix();
-		glTranslatef(test[0], test[1], test[2] );
-	        glutSolidSphere(0.05f,10.0f,10.0f);
-	        glPopMatrix();
-	        glPushMatrix();
-	        glTranslatef(test2[0], test2[1], test2[2] );
-	        glutSolidSphere(0.05f,10.0f,10.0f);
-	        glPopMatrix();
+		Vector3f color = depthColor(pos[2], flock[i].color);
+		glColor3f(color[0], color[1], color[2]);
 	         
 		float xyAngle = atan2(vel[1], vel[0]) * 180 / PI;
 		glRotatef(xyAngle, 0, 0, 1);
+		
+		glPushMatrix();
+		glScaled(0.5f,1.1f,1.0f);
+		glTranslatef(0.01, -0.07, 0);
+	        glutSolidSphere(0.05f,10.0f,10.0f);
+		glTranslatef(0.01, 0.14, 0);
+		glutSolidSphere(0.05f,10.0f,10.0f);
+		glPopMatrix();
+		
+		glBegin(GL_TRIANGLES);
+		glVertex3f(-0.16, 0, 0);
+		glVertex3f(-0.27, 0.08, 0);
+		glVertex3f(-0.25, 0, 0);
+		glVertex3f(-0.16, 0, 0);
+		glVertex3f(-0.25, 0, 0);
+		glVertex3f(-0.27, -0.08, 0);      
+		glEnd();
+				
 		glScaled(0.2f,0.075f,0.075f);
-		Vector3f color = depthColor(pos[2], flock[i].color);
-		glColor3f(color[0], color[1], color[2]);
 	        glutSolidSphere(1.0f,10.0f,10.0f);
 	        
+		
 
 	        
 	        
