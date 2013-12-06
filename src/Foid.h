@@ -26,6 +26,8 @@ public:
 	float m_tail[3]; 
 	
 	int mult;
+	
+	float increment;
 
 protected:
 	Vector3f m_pos;

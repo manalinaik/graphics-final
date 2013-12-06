@@ -116,10 +116,12 @@ Vector3f FlockSystem::separation(int particleIndex, vector<Vector3f> state)
 	    dist.normalize();
 	    sep += (dist / dist.abs());
 	    count++;
-	    if (abs(dist[2]) < 0.1) {
-		int sign = (rand() % 2) * 2 - 1;
-		float z = sign * 0.01 * (rand() % 5);
-		sep += Vector3f(0, 0, z);
+	    for (int i = 0; i < 3; i++) {
+		    if (abs(dist[i]) < 0.1) {
+			int sign = (rand() % 2) * 2 - 1;
+			float z = sign * 0.02 * (rand() % 5);
+			sep[i] += z;
+		    }
 	    }
 	}
     }
@@ -215,14 +217,17 @@ void FlockSystem::limit(Vector3f& desired, Vector3f vel)
 // render the system (ie draw the particles)
 void FlockSystem::draw()
 {
-	for (int i = 0; i < m_numParticles; i++) {
+	for (int i = 0; i < m_numParticles; i++) {	
 		Vector3f pos = getParticlePos(i);
 		Vector3f vel = getParticleVel(i);
+		if (rand()%100 < 10)
+			vel *= 2;
 		
 		Vector3f cross = Vector3f::cross(vel, Vector3f(0,0,1)).normalized() * 0.06;
 	        Vector3f test = vel/8 + cross;
 	        Vector3f test2 = vel/8 - cross;
 	        
+	        float maxTailDisplace = flock[i].increment*9;
 	        
 		glPushMatrix();
 		glTranslatef(pos[0], pos[1], pos[2] );
@@ -241,32 +246,44 @@ void FlockSystem::draw()
 		glutSolidSphere(0.05f,10.0f,10.0f);
 		glPopMatrix();
 		
+		glPushMatrix();
+		glTranslatef(-0.16, 0, 0);
+		glRotatef(flock[i].m_tail[0]/maxTailDisplace*10, 0, 0, 1);
 		glBegin(GL_TRIANGLES);
-		glVertex3f(-0.16, 0.05, 0);
-		glVertex3f(-0.24, flock[i].m_tail[0], 0);
-		glVertex3f(-0.16, -0.05, 0);
-		
-		glVertex3f(-0.2, 0.04+flock[i].m_tail[0], 0);
-		glVertex3f(-0.28, flock[i].m_tail[1], 0);
-		glVertex3f(-0.2, -0.04+flock[i].m_tail[0], 0);
-		
-		glVertex3f(-0.17, flock[i].m_tail[1], 0);
-		glVertex3f(-0.30, 0.06+flock[i].m_tail[2], 0);
-		glVertex3f(-0.26, flock[i].m_tail[1], 0);
-		
-		glVertex3f(-0.17, flock[i].m_tail[1], 0);
-		glVertex3f(-0.26, flock[i].m_tail[1], 0);
-		glVertex3f(-0.30, -0.06+flock[i].m_tail[2], 0);
+		glVertex3f(-0.0, 0.05, 0);
+		glVertex3f(-0.08, 0, 0);
+		glVertex3f(-0.0, -0.05, 0);
 		glEnd();
-				
+		
+		glTranslatef(-0.04, 0, 0);
+		glRotatef(flock[i].m_tail[1]/maxTailDisplace*10, 0, 0, 1);
+		glBegin(GL_TRIANGLES);
+		glVertex3f(-0.0, 0.04, 0);
+		glVertex3f(-0.08, 0, 0);
+		glVertex3f(-0.0, -0.04, 0);
+		glEnd();
+		
+		glTranslatef(-0.02, 0, 0);
+		glRotatef(flock[i].m_tail[2]/maxTailDisplace*10, 0, 0, 1);
+		glBegin(GL_TRIANGLES);
+		glVertex3f(-0.0, 0, 0);
+		glVertex3f(-0.08, 0.06, 0);
+		glVertex3f(-0.04, 0, 0);
+		
+		glVertex3f(-0.0, 0, 0);
+		glVertex3f(-0.04, 0, 0);
+		glVertex3f(-0.08, -0.06, 0);
+		glEnd();
+		glPopMatrix();
+		
 		glScaled(0.2f,0.075f,0.075f);
 	        glutSolidSphere(1.0f,10.0f,10.0f);
 	        
 	        flock[i].m_tail[2] = flock[i].m_tail[1];
 		flock[i].m_tail[1] = flock[i].m_tail[0];
-		if (flock[i].m_tail[0] > 0.019 || flock[i].m_tail[0] < -0.019)
+		if (flock[i].m_tail[0] > maxTailDisplace || flock[i].m_tail[0] < -maxTailDisplace)
 			flock[i].mult *= -1;
-		flock[i].m_tail[0] = flock[i].m_tail[0] + flock[i].mult*0.002;
+		flock[i].m_tail[0] = flock[i].m_tail[0] + flock[i].mult*flock[i].increment;
 	        
 		glEnable(GL_LIGHTING);
 		glPopMatrix();

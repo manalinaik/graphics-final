@@ -5,10 +5,11 @@ Foid::Foid(float mass, Vector3f pos, Vector3f vel) {
 	m_pos = pos;
 	m_vel = vel;
 	mult = rand()%2*2 - 1;
+	increment = (rand()%7 + 1) * 0.001;
 	
-	m_tail[0] = rand()%10 * 0.002;
-	m_tail[1] = rand()%10 * 0.002;
-	m_tail[2] = rand()%10 * 0.002;
+	m_tail[0] = rand()%10 * increment;
+	m_tail[1] = rand()%10 * increment;
+	m_tail[2] = rand()%10 * increment;
 }
 
 Vector3f Foid::getPos() {

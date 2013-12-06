@@ -242,20 +242,31 @@ void FlockSystem::draw()
 		glPopMatrix();
 		
 		glBegin(GL_TRIANGLES);
-		glVertex3f(-0.16, 0, 0);
-		glVertex3f(-0.27, 0.08, 0);
-		glVertex3f(-0.25, 0, 0);
-		glVertex3f(-0.16, 0, 0);
-		glVertex3f(-0.25, 0, 0);
-		glVertex3f(-0.27, -0.08, 0);      
+		glVertex3f(-0.16, 0.05, 0);
+		glVertex3f(-0.24, flock[i].m_tail[0], 0);
+		glVertex3f(-0.16, -0.05, 0);
+		
+		glVertex3f(-0.2, 0.04+flock[i].m_tail[0], 0);
+		glVertex3f(-0.28, flock[i].m_tail[1], 0);
+		glVertex3f(-0.2, -0.04+flock[i].m_tail[0], 0);
+		
+		glVertex3f(-0.17, flock[i].m_tail[1], 0);
+		glVertex3f(-0.30, 0.06+flock[i].m_tail[2], 0);
+		glVertex3f(-0.26, flock[i].m_tail[1], 0);
+		
+		glVertex3f(-0.17, flock[i].m_tail[1], 0);
+		glVertex3f(-0.26, flock[i].m_tail[1], 0);
+		glVertex3f(-0.30, -0.06+flock[i].m_tail[2], 0);
 		glEnd();
 				
 		glScaled(0.2f,0.075f,0.075f);
 	        glutSolidSphere(1.0f,10.0f,10.0f);
 	        
-		
-
-	        
+	        flock[i].m_tail[2] = flock[i].m_tail[1];
+		flock[i].m_tail[1] = flock[i].m_tail[0];
+		if (flock[i].m_tail[0] > 0.019 || flock[i].m_tail[0] < -0.019)
+			flock[i].mult *= -1;
+		flock[i].m_tail[0] = flock[i].m_tail[0] + flock[i].mult*0.002;
 	        
 		glEnable(GL_LIGHTING);
 		glPopMatrix();
